@@ -12,7 +12,7 @@ const db = mysql.createPool({
     user: 'item1z6pj06n4wle',
     password: 'i2hdaaf22omv7ssf',
     database: 'hsfrci7d1hukw93p',
-    port: 'hsfrci7d1hukw93p'
+    port: '3306'
 });
 
 
@@ -149,6 +149,6 @@ app.put('/api/news/update', (req,res) => {
     });
 });
 
-app.listen( process.env.HOST || 3001, () =>{
+app.listen( process.env.port || 3001, () =>{
     console.log("running on port ", process.env.HOST || 3001);
 });
