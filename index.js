@@ -8,10 +8,11 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.use(cors());
 
 const db = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: '1234',
-    database: 'helpcuceidb'
+    host: 'wb39lt71kvkgdmw0.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
+    user: 'item1z6pj06n4wle',
+    password: 'i2hdaaf22omv7ssf',
+    database: 'hsfrci7d1hukw93p',
+    port: 'hsfrci7d1hukw93p'
 });
 
 
@@ -148,6 +149,6 @@ app.put('/api/news/update', (req,res) => {
     });
 });
 
-app.listen(3001, () =>{
-    console.log("running on port 3001");
+app.listen( process.env.HOST || 3001, () =>{
+    console.log("running on port ", process.env.HOST || 3001);
 });
