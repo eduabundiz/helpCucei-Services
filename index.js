@@ -15,6 +15,12 @@ const db = mysql.createPool({
     port: '3306'
 });
 
+const db2 = mysql.createPool({
+    host: 'wb39lt71kvkgdmw0.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
+    user: 'item1z6pj06n4wle',
+    password: 'i2hdaaf22omv7ssf',
+    database: 'hsfrci7d1hukw93p'
+});
 
 app.use('/api/login', (req, res) => {
     const sqlStatement= "SELECT * FROM usuarios WHERE correo = ? AND contraseña = ?;";
@@ -23,7 +29,7 @@ app.use('/api/login', (req, res) => {
             res.send({
                 token: req.body.username,
           });
-        }else{
+        } else{
             res.send(err);
         }
     });
@@ -67,6 +73,13 @@ app.get('/api/posts/categoryposts', (req, res) =>{
 
 app.get('/api/comments/get', (req, res) =>{
     const sqlStatement= "SELECT P.id, P.idUsuario, P.contenido, P.fecha, P.idPost, P.status, P.comentario, P.estadoAprobacion, A.nombre, A.apellidoPaterno, A.apellidoMaterno, A.correo FROM comentarios AS P INNER JOIN usuarios AS A ON P.idUsuario = A.id WHERE P.idPost = ?;";
+    db.query(sqlStatement, parseInt(req.query.id), (err, result) =>{
+        res.send(result);
+    });
+});
+
+app.get('/api/comments/getall', (req, res) =>{
+    const sqlStatement= "SELECT * FROM comentarios;";
     db.query(sqlStatement, parseInt(req.query.id), (err, result) =>{
         res.send(result);
     });
@@ -117,8 +130,9 @@ app.post('/api/insert', (req,res) => {
         console.log("DATA: ",data);
         const sqlStatement = "INSERT INTO usuarios (nombre, apellidoPaterno, apellidoMaterno, fechaNacimiento, correo, contraseña, rol, fechaIngreso, fechaRegistro, idCarrera) VALUES (?,?,?,?,?,?,?,?,?,?);"
         db.query(sqlStatement, [data.nombre, data.apellidoP, data.apellidoM, data.fechaNacimiento, data.correo, data.contraseña, data.rol, data.fechaIngreso, data.fechaRegistro, data.idCarrera], (err, result) => {
-            console.log("error? ", err);
-            console.log("result? ", result);
+            console.log('RES: ',result);
+            console.log('ERR: ',err);
+            res.send(result);
         });
     }catch{
         console.log("ERROR AL INSERTAR USUARIO");
@@ -129,45 +143,65 @@ app.post('/api/insert', (req,res) => {
 app.post('/api/posts/insert', (req,res) => {
     const sqlStatement = "INSERT INTO posts (idUsuario, titulo, contenido, fecha, idAreaSocial, idCarrera, comentario, imgurl, status, estadoAprobacion) VALUES (?,?,?,?,?,?,?,?,?,?);"
     db.query(sqlStatement, [req.body.idUsuario, req.body.titulo, req.body.contenido, req.body.fecha, req.body.areasocial, req.body.carrera, req.body.comentario, req.body.imgurl, req.body.status, req.body.estadoAprobacion], (err, result) => {
-        console.log(err);
-        console.log("result? ", result);
+        console.log('RES: ',result);
+        console.log('ERR: ',err);
+        res.send(result);
     });
 });
 
 app.post('/api/comments/insert', (req,res) => {
     const sqlStatement = "INSERT INTO comentarios (idUsuario, contenido, fecha, idPost, status, comentario, estadoAprobacion) VALUES (?,?,?,?,?,?,?);"
     db.query(sqlStatement, [req.body.idUsuario, req.body.contenido, req.body.fecha, req.body.idPost, req.body.status, req.body.comentario, req.body.estadoAprobacion], (err, result) => {
-        console.log(err);
-        console.log("result? ", result);
+        console.log('RES: ',result);
+        console.log('ERR: ',err);
+        res.send(result);
     });
 });
 
 app.post('/api/news/insert', (req,res) => {
     const sqlStatement = "INSERT INTO informacion (fechaInicio, fechaTermino, tema, prioridad, contenido, referencia, idAreaSocial, status, estadoAprobacion, imgurl) VALUES (?,?,?,?,?,?,?,?,?,?);"
     db.query(sqlStatement, [req.body.fechaInicio, req.body.fechaFin, req.body.tema, req.body.prioridad, req.body.contenido, req.body.referencia, req.body.areasocial, req.body.status, req.body.estadoAprobacion, req.body.imgurl], (err, result) => {
-        console.log(err);
-        console.log("result? ", result);
+        console.log('RES: ',result);
+        console.log('ERR: ',err);
+        res.send(result);
     });
 });
 
 app.put('/api/posts/update', (req,res) => {
     const sqlStatement = "UPDATE posts SET estadoAprobacion = ? WHERE id = ?;"
     db.query(sqlStatement, [req.body.estadoAprobacion, req.body.id], (err, result) => {
-        console.log(err);
+        console.log('RES: ',result);
+        console.log('ERR: ',err);
+        res.send(result);
     });
 });
 
 app.put('/api/news/update', (req,res) => {
     const sqlStatement = "UPDATE informacion SET estadoAprobacion = ? WHERE id = ?;"
     db.query(sqlStatement, [req.body.estadoAprobacion, req.body.id], (err, result) => {
-        console.log(err);
+        console.log('RES: ',result);
+        console.log('ERR: ',err);
+        res.send(result);
+    });
+});
+
+app.put('/api/comment/update', (req,res) => {
+    console.log("ea: ",req.body.estadoAprobacion);
+    console.log("id: ",req.body.id);
+    const sqlStatement = "UPDATE comentarios SET estadoAprobacion = ? WHERE id = ?;"
+    db.query(sqlStatement, [req.body.estadoAprobacion, req.body.id], (err, result) => {
+        console.log('RES: ',result);
+        console.log('ERR: ',err);
+        res.send(result);
     });
 });
 
 app.put('/api/role/update', (req,res) => {
     const sqlStatement = "UPDATE usuarios SET rol = ? WHERE id = ?;"
     db.query(sqlStatement, [req.body.rol, req.body.id], (err, result) => {
-        console.log(err);
+        console.log('RES: ',result);
+        console.log('ERR: ',err);
+        res.send(result);
     });
 });
 
@@ -184,6 +218,7 @@ app.put('/api/user/update', (req,res) => {
         req.body.user.id], (err, result) => {
         console.log('RES: ',result);
         console.log('ERR: ',err);
+        res.send(result);
     });
 });
 
@@ -193,6 +228,56 @@ app.put('/api/password/update', (req,res) => {
     db.query(sqlStatement, [req.body.password, req.body.id], (err, result) => {
         console.log('RES: ',result);
         console.log('ERR: ',err);
+        res.send(result);
+    });
+});
+
+app.get('/api/posts/countall', (req, res) =>{
+    const sqlStatement= "SELECT COUNT(status) AS cantidad FROM posts WHERE status = 1;";
+    db.query(sqlStatement, (err, result) =>{
+        console.log('RES: ',result);
+        console.log('ERR: ',err);
+        res.send(result);
+    });
+});
+app.get('/api/news/countall', (req, res) =>{
+    const sqlStatement= "SELECT COUNT(status) AS cantidad FROM informacion WHERE status = 1;";
+    db.query(sqlStatement, (err, result) =>{
+        console.log('RES: ',result);
+        console.log('ERR: ',err);
+        res.send(result);
+    });
+});
+app.get('/api/users/countall', (req, res) =>{
+    const sqlStatement= "SELECT COUNT(status) AS cantidad FROM usuarios WHERE status = 1;";
+    db.query(sqlStatement, (err, result) =>{
+        console.log('RES: ',result);
+        console.log('ERR: ',err);
+        res.send(result);
+    });
+});
+app.get('/api/comments/countall', (req, res) =>{
+    const sqlStatement= "SELECT COUNT(status) AS cantidad FROM comentarios WHERE status = 1;";
+    db.query(sqlStatement, (err, result) =>{
+        console.log('RES: ',result);
+        console.log('ERR: ',err);
+        res.send(result);
+    });
+});
+app.get('/api/posts/countone', (req, res) =>{
+    const sqlStatement= "SELECT T1.cant AS cantp, T2.cant AS cantn FROM (SELECT COUNT(status) AS cant FROM posts WHERE idAreaSocial = ?) AS T1, (SELECT COUNT(status) AS cant FROM informacion WHERE idAreaSocial = ?) AS T2;";
+    db.query(sqlStatement, [req.query.id, req.query.id], (err, result) =>{
+        console.log('RES: ',result);
+        console.log('ERR: ',err);
+        res.send(result);
+    });
+});
+app.get('/api/news/countone', (req, res) =>{
+    const sqlStatement= "SELECT COUNT(status) AS cantidad FROM informacion WHERE status = 1 AND idAreaSocial = ?;";
+    db.query(sqlStatement, req.query.id, (err, result) =>{
+        console.log('RES: ',result);
+        console.log('ERR: ',err);
+        res.send(result);
     });
 });
 
